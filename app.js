@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
-
+const { getAllFiles, getTree } = require('./helpers/files2')
 const { getDates } = require('./helpers/sundays')
 const { concatenar } = require('./helpers/bisiesto')
 const { countLetter, logMapElements, rotateMatrix } = require('./helpers/functions')
@@ -74,6 +74,32 @@ app.get('/getMatrix', (req, res) =>{
   })
 })
 
+app.get('/getFileTree', (req, res) =>{
+  let ruta = req.body.param1
+ 
+  let directories = getAllFiles(ruta)
+
+  let response = getTree(ruta, directories)
+  console.log(response)
+
+  try {
+      
+      res.status(200).json({
+        
+        result: response
+        
+    })
+  }
+  catch (err) {
+      res.status(500).json({
+        error: err
+      })
+    // expected output: ReferenceError: nonExistentFunction is not defined
+    // Note - error messages will vary depending on browser
+  }
+  
+})
+
 // middleware to catch non-existing routes
 app.get('*', function(req, res){
     res.send('route not found', 404);
@@ -81,7 +107,7 @@ app.get('*', function(req, res){
 
   
 
-/*
+
 app.use((err, req, res, next) => {
     res.status(err.status || 500)
     res.send({
@@ -92,7 +118,7 @@ app.use((err, req, res, next) => {
     })
   })
 
-  */
+  
 
 app.listen(3001, ()=>{
     console.log('server is running in http://localhost:3001')
